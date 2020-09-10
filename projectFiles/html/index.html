@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <title>Hello World</title>
+    <script src="js/pixi.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    let type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas"
+    }
+
+    PIXI.utils.sayHello(type)
+    let player = {
+        "progress": {},
+        "inventory": []
+    };
+
+    //Create a Pixi Application
+    let app = new PIXI.Application({width: 800, height: 600});
+
+    //Add the canvas that Pixi automatically created for you to the HTML document
+    document.body.appendChild(app.view);
+
+    PIXI.Loader.shared
+          .add("asset/stage1.png")
+          .add("asset/inventory-1.png")
+          .add("asset/inventory-2.png")
+          .add("asset/inventory-bar.png")
+          .add("asset/close.png")
+          .load(setup);
+
+    function setup() {
+            let cat = new PIXI.Sprite(PIXI.Loader.shared.resources["asset/stage1.png"].texture);
+            const inventoryTexture = PIXI.Texture.from('asset/inventory-1.png');
+            const inventoryTextureHover = PIXI.Texture.from('asset/inventory-2.png');
+            const inventoryBarTexture = PIXI.Texture.from('asset/inventory-bar.png');
+            const closeTexture = PIXI.Texture.from('asset/close.png');
+            const itemTexture = PIXI.Texture.from('asset/knife.png');
+            let inventoryBtn = new PIXI.Sprite(inventoryTexture);
+            let inventoryBar = new PIXI.Sprite(inventoryBarTexture);
+            let closeInventory = new PIXI.Sprite(closeTexture);
+            let item = new PIXI.Sprite(itemTexture);
+            inventoryBtn.interactive = true;
+            // inventoryBtn.buttonMode = true;
+
+            inventoryBtn.on('mouseover', () => {
+                 inventoryBtn.texture = inventoryTextureHover;
+            });
+            inventoryBtn.on('mouseout', () => {
+                 inventoryBtn.texture = inventoryTexture;
+            });
+            inventoryBtn.on('click', () => {
+                 inventoryBtn.alpha = 0;
+                inventoryBar.alpha = 1;
+                closeInventory.alpha = 1;
+                loadInventory(0);
+            });
+            inventoryBar.alpha = 0;
+            inventoryBar.x = 5;
+            inventoryBar.y = 5;
+
+            closeInventory.alpha = 0;
+            closeInventory.x = 700;
+            closeInventory.y = 5;
+            closeInventory.interactive = true;
+            closeInventory.on('click', () => {
+                inventoryBar.alpha = 0;
+                closeInventory.alpha = 0;
+                inventoryBtn.alpha = 1;
+            });
+
+            app.stage.addChild(cat);
+            app.stage.addChild(inventoryBtn);
+            app.stage.addChild(inventoryBar);
+            app.stage.addChild(closeInventory);
+            if (inScene(item)) {
+                item.on('click', () => {
+                    take(item.texture.id);
+                });
+            }
+            app.stage.addChild(item);
+
+
+          }
+
+        let inventoryList = [];
+
+        function isInScene(idObj) {
+            return true;
+        }
+
+        function take(idObj) {
+
+        }
+        function loadInventory(page) {
+
+        }
+
+
+</script>
+</body>
+</html>

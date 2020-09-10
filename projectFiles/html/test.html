@@ -1,0 +1,262 @@
+<html>
+<head>
+    <script type="text/javascript" src="js/gen.js"></script>
+    <style>
+
+    footer {
+       position: fixed;
+       left: 0;
+       bottom: 0;
+       width: 100%;
+       background-color: red;
+       color: white;
+       text-align: center;
+    }
+
+        aside {
+            width: 40%;
+            padding-left: .5rem;
+            margin-left: .5rem;
+            float: right;
+            box-shadow: inset 5px 0 5px -5px #29627e;
+            font-style: italic;
+            color: #29627e;
+        }
+
+        aside > p {
+            margin: .5rem;
+        }
+
+        p {
+            font-family: 'Fira Sans', sans-serif;
+        }
+
+div.scrollframe {
+    /*scroll*/
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+    /*display image horizontally*/
+    float:left;
+    margin-right:10px;
+}
+
+div.framecontainer {
+    display:inline-block;
+    position: relative;
+    /*text-align:center;*/
+}
+
+div.close {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+}
+
+div.frameselected {
+    border-style: dashed;
+}
+
+
+    </style>
+</head>
+<body>
+
+<script>
+function preloadImages(array) {
+    if (!preloadImages.list) {
+        preloadImages.list = [];
+    }
+    var list = preloadImages.list;
+    for (var i = 0; i < array.length; i++) {
+        var img = new Image();
+        img.onload = function() {
+            var index = list.indexOf(this);
+            if (index !== -1) {
+                // remove image from the array once it's loaded
+                // for memory consumption reasons
+                list.splice(index, 1);
+            }
+        }
+        list.push(img);
+        img.src = array[i];
+    }
+}
+
+preloadImages(["./asset/knife.png"]);
+
+    let conf = {
+        "pics": [
+            {"id":"idpfr1", "path":"./asset/knife.png"},
+            {"id":"idpfr2", "path":"./asset/knife.png"},
+            {"id":"idpfr3", "path":"./asset/knife.png"}
+        ]
+    };
+
+    let map = {};
+    for (let i = 0 ; i < conf["pics"].length ; i++) {
+        map[conf["pics"][i].id] = { "path": conf.pics[i].path };
+    }
+
+
+
+</script>
+
+<header>
+
+</header>
+
+<aside>
+    <p>The Rough-skinned Newt defends itself with a deadly neurotoxin.</p>
+        <label for="browser">Choose your browser from the list:</label>
+        <input list="browsers" name="browser" id="browser" onchange="javascript:go('browser')">
+        <datalist id="browsers">
+            <!-- <option value="Edge">
+             <option value="Firefox" onselect="javascript:console.log('yes')">
+             <option value="Chrome">
+             <option value="Opera">
+             <option value="Safari">-->
+        </datalist>
+        <br/>
+        <input id="frameIdx" type="text" value="0"/>
+        <img id="selectedImage" src="./asset/knife.png">
+        <input onclick="javacript:addNewFrameToFrameBar()" type="button" value="Validay">
+</aside>
+
+
+<footer>
+    <div id="frames" class="scrollframe">
+        <div class="framecontainer" onclick="javascript:frameSelected(0, this)">
+            <img src="./asset/knife.png">
+            <div class="close"><img src="./asset/close.png" onclick="javascript:deleteFrame(0)"></div>
+            <br>
+            <div name="indexValue">0</div>
+        </div>
+        <div class="framecontainer">
+            <img src="./asset/knife.png" onclick="javascript:frameSelected(1, this.parentNode)">
+            <div class="close" onclick="javascript:deleteFrame(1)"><img src="./asset/close.png"></div>
+            <br>
+            <div name="indexValue">1</div>
+        </div>
+    </div>
+</footer>
+
+</body>
+<script>
+
+
+let valueToId= {};
+    function go(selected) {
+        console.log(id(selected).value);
+        let idData = valueToId[id(selected).value];
+        console.log(idData);
+        console.log(JSON.stringify(map));
+        console.log(map[idData].path);
+        let imgPath = map[idData].path;
+        id('selectedImage').src = imgPath;
+    }
+    function id(i) {
+        return document.getElementById(i);
+    }
+
+    function tag(name) {
+        return document.createElement(name);
+    }
+
+    function refreshFrameIndex() {
+        let divs = document.getElementsByName("indexValue");
+        let count = 0;
+        console.log(divs.length + ' found');
+        for (let i = 0 ; i < divs.length ; i++) {
+            console.log(count);
+            divs[i].innerHTML = count++;
+        }
+    }
+
+    function addNewFrameToFrameBar() {
+        let valueFromDropDownList = id('browser');
+        let idFrame = valueToId[valueFromDropDownList.value];
+        let path = map[idFrame].path;
+        //debugger;
+        id('frames').appendChild(GENERATE_FRAME(path, id('frameIdx').value, './asset/close.png'));
+    }
+
+    function removeSelectionStyleToFrameContainer(frameContainer) {
+        console.log("-> removeSelectionStyleToFrameContainer(frameContainer)");
+        console.log("--> Current class name = "+ frameContainer.className);
+        frameContainer.className = frameContainer.className.replace(" frameselected", "");
+        console.log("--> Class name after update = "+ frameContainer.className);
+    }
+
+    function addSelectionStyleToFrameContainer(frameContainer) {
+        if (!frameContainer.className) {
+            frameContainer.className = " frameselected";
+        } else {
+            frameContainer.className += " frameselected";
+        }
+    }
+
+    let frameIdxSelected = undefined;
+    function frameSelected(idx, obj) {
+        console.log("-> frameSelected("+idx+", "+obj);
+        console.log("--> frameIdxSelected = "+frameIdxSelected)
+        let frames = id('frames');
+        if (frameIdxSelected !== undefined) {
+            removeSelectionStyleToFrameContainer(frames.children[frameIdxSelected]);
+        }
+        frameIdxSelected = idx;
+        console.log(JSON.stringify(frames.childNodes));
+        //framesDiv = frames.childNodes.filter(e => e.className === "framecontainer" && e.nodeName === "DIV");
+        console.log("Clicked on index " + frameIdxSelected + ". So we'll take : " + frames.children[frameIdxSelected]);
+        addSelectionStyleToFrameContainer(frames.children[frameIdxSelected]);
+    }
+
+    function addFrame(path, index) {
+        let image = tag('img');
+        image.src = path;
+        let frames = id('frames');
+        let nbrFrames = 0;//frames.childNodes.length;
+        frames.childNodes.forEach(e => e.nodeType == 1 ? nbrFrames++ : undefined);
+        let divFrame = tag('div');
+        divFrame.className = "framecontainer";
+        divFrame.appendChild(image);
+        divFrame.appendChild(tag('br'));
+        divFrame.onclick = "javascript:frameSelected("+index+", this)";
+        let divIndex = tag('div');
+        divIndex.setAttribute('name', "indexValue"); // just doing ".name =xxx;" won't allow us to do getElementsByName
+        divIndex.innerHTML=index;
+        divFrame.appendChild(divIndex);
+        if (nbrFrames === 0 || index == nbrFrames) {
+            frames.appendChild(divFrame);
+        } else {
+            frames.insertBefore(divFrame, frames.childNodes[index+1]);
+        }
+        refreshFrameIndex();
+    }
+
+    function deleteFrame(idx) {
+        let frames = id('frames');
+        let elementToDelete = frames.children[idx];
+        elementToDelete.parentNode.removeChild(elementToDelete);
+        //delete frames.children[idx];
+        refreshFrameIndex();
+    }
+
+    function addOption(idInput, idOption, value) {
+        let input = id(idInput);
+        let option = document.createElement('option');
+        option.value = value;
+        option.id = idOption;
+        input.appendChild(option);
+        valueToId[value] = idOption;
+    }
+    addOption('browsers', 'idpfr1', 'zoyo1');
+    addOption('browsers', 'idpfr2', 'zoyo12');
+    addOption('browsers', 'idpfr3', 'zoyo23');
+    //id('frames').appendChild(GENERATE_FRAME('./asset/knife.png', 2, "./asset/close.png"));
+    ;
+    //addFrame("./asset/close.png", 0);
+
+
+</script>
+</html>
